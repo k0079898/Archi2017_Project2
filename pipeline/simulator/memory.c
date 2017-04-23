@@ -1,5 +1,14 @@
 #include "memory.h"
 
+void initMem()
+{
+  for(int i=0; i<MEM_SIZE; i++)
+  {
+    iMem[i] = 0;
+    dMem[i] = 0;
+  }
+}
+
 void readBin()  //Read iimage.bin & dimage.bin into buffer
 {
   unsigned int iimageSize = 0, dimageSize = 0;
@@ -35,7 +44,8 @@ void writeMem()  //Write data into memory & free the buffer
   PC = temp;
   initPC = temp;
   for(m=4; m<8; m++) line = (line<<8) + (unsigned char)iBuffer[m];
-  for(m=8; m<8+line*4; m++) iMem[m-8] = iBuffer[m];
+  for(m=8; m<8+line*4; m++) iMem[PC+m-8] = iBuffer[m];
+  for(m=0; m<4; m++) IF = (IF<<8) + (unsigned char)iMem[PC+m];
   //Handle with dMemory
   temp = 0;
   line = 0;

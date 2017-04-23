@@ -2,9 +2,8 @@
 
 void initREG() //Initial the register
 {
-  int i;
-  for(i=0; i<REG_SIZE; i++) L_REG[i] = REG[i];
-  L_HI = HI;
-  L_LO = LO;
-  L_PC = PC;
+  for(int i=0; i<REG_SIZE; i++) REG[i] = 0;
+  PC = 0;
+  HI = 0;
+  LO = 0;
 }

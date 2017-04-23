@@ -15,6 +15,7 @@ unsigned char *iBuffer, *dBuffer;
 unsigned char iMem[MEM_SIZE];
 unsigned char dMem[MEM_SIZE];
 
+void initMem();   //Initial iMemory & dMemory
 void readBin();   //Read iimage.bin & dimage.bin into buffer
 void writeMem();  //Write data into memory & free the buffer
 void memDebug();  //Memory debug function
