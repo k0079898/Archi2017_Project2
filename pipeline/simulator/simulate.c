@@ -2,12 +2,14 @@
 #include "piperpt.h"
 #include "memory.h"
 #include "regfile.h"
+#include "pipereg.h"
 
 void initialSetting()
 {
   initOutputSetting();
   initMem();
   initREG();
+  initPipeReg();
 }
 
 int main()
@@ -18,6 +20,7 @@ int main()
   readBin();
   writeMem();
   cycles = 0;
+  initPipeReg();
   writeInitSnapshot();
   //Do something
   closeFile();

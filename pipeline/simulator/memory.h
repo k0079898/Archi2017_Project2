@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "regfile.h"
+#include "pipereg.h"
 
 #define MEM_SIZE 1024
 
