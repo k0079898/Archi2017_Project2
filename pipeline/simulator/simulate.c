@@ -3,19 +3,19 @@
 #include "memory.h"
 #include "regfile.h"
 #include "pipereg.h"
+#include "pipeline.h"
 
 void initialSetting()
 {
   initOutputSetting();
   initMem();
   initREG();
-  initPipeReg();
 }
 
 int main()
 {
   //Initial the simlator
-  unsigned int cycles, halt;
+  unsigned int cycles;
   initialSetting();
   readBin();
   writeMem();

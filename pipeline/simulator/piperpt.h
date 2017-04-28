@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "instruction.h"
 #include "regfile.h"
 #include "pipereg.h"
 

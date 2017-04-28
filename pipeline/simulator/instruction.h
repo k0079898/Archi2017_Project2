@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 #include "memory.h"
 
 typedef struct _instruction {
@@ -16,11 +15,11 @@ typedef struct _instruction {
   unsigned int C;
   unsigned int funct;
   char name[5];
-} instruction;
+} instIF;
 
-instruction IF, ID, EX, DM, WB;
+instIF IF;
 
-void instructionIF();
+void getIF();
 void decodeIF();
 
 #endif

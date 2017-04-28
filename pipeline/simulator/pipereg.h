@@ -2,22 +2,20 @@
 #define pipereg_h
 
 #include <stdio.h>
-#include <stdbool.h>
 #include "instruction.h"
-#include "memory.h"
 #include "regfile.h"
 
 typedef struct forwarding {
-	bool forward;
-	bool rs;
-	bool rt;
+	int forward;
+	int rs;
+	int rt;
 } forwarding;
 
 typedef struct IFtoID {
     unsigned int PC;
     unsigned int instruction;
-    bool stall;
-    bool flush;
+    int stall;
+    int flush;
 } IFtoID;
 
 typedef struct IDtoEX {
@@ -32,9 +30,10 @@ typedef struct IDtoEX {
     unsigned int rd;
     unsigned int C;
     unsigned funct;
-    char name[5];
-    bool stall;
-    bool NOP;
+    char instName[5];
+    int stall;
+    int flushIF;
+    int NOP;
     forwarding fwd;
 } IDtoEX;
 
@@ -43,11 +42,12 @@ typedef struct EXtoDM {
     unsigned int instruction;
     unsigned int opcode;
     char instructionType;
-    unsigned ALUresult;
     unsigned int rd;
     unsigned int rt;
-    char name[5];
-    bool NOP;
+    unsigned int REG_rt;
+    char instName[5];
+    unsigned int ALUresult;
+    int NOP;
     forwarding fwd;
 } EXtoDM;
 
@@ -56,15 +56,27 @@ typedef struct DMtoWB {
     unsigned int instruction;
     unsigned int opcode;
     char instructionType;
-    char name[5];
-    unsigned int data;
-    unsigned ALUresult;
+    char instName[5];
+    unsigned int rd;
+    unsigned int rt;
+    unsigned int memData;
+    unsigned int ALUresult;
+    int NOP;
 } DMtoWB;
 
-IFtoID IF_ID;
-IDtoEX ID_EX;
-EXtoDM EX_DM;
-DMtoWB DM_WB;
+typedef struct prevDMtoWB {
+    unsigned int PC;
+    unsigned int instruction;
+    unsigned int opcode;
+    char instName[5];
+    int NOP;
+} prevDMtoWB;
+
+IFtoID      IF_ID;
+IDtoEX      ID_EX;
+EXtoDM      EX_DM;
+DMtoWB      DM_WB;
+prevDMtoWB  prevDM_WB;
 
 void initPipeReg();
 

@@ -75,14 +75,14 @@ void writeSnapshot(unsigned int cycles)
   }
   fprintf(snapshot, "IF: 0x%08X\n", IF.inst);
   printf("IF: 0x%08X\n", IF.inst);
-  fprintf(snapshot, "ID: NOP\n");
-  printf("ID: NOP\n");
-  fprintf(snapshot, "EX: NOP\n");
-  printf("EX: NOP\n");
-  fprintf(snapshot, "DM: NOP\n");
-  printf("DM: NOP\n");
-  fprintf(snapshot, "WB: NOP\n\n\n");
-  printf("WB: NOP\n\n\n");
+  fprintf(snapshot, "ID: %s\n", ID_EX.instName);
+  printf("ID: %s\n", ID_EX.instName);
+  fprintf(snapshot, "EX: %s\n", EX_DM.instName);
+  printf("EX: %s\n", EX_DM.instName);
+  fprintf(snapshot, "DM: %s\n", DM_WB.instName);
+  printf("DM: %s\n", DM_WB.instName);
+  fprintf(snapshot, "WB: %s\n\n\n", prevDM_WB.instName);
+  printf("WB: %s\n\n\n", prevDM_WB.instName);
 }
 
 
@@ -93,6 +93,11 @@ void writeError(unsigned int cycles)
 		fprintf(error_dump, "In cycle %d: Write $0 Error\n", cycles);
 		printf("In cycle %d: Write $0 Error\n", cycles);
 	}
+  if(overwriteHILO==1)
+  {
+    fprintf(error_dump, "In cycle %d: Overwrite HI-LO registers\n", cycles);
+    printf("In cycle %d: Overwrite HI-LO registers\n", cycles);
+  }
   if(memAddOverflow==1)
 	{
 		fprintf(error_dump, "In cycle %d: Address Overflow\n", cycles);
@@ -102,11 +107,6 @@ void writeError(unsigned int cycles)
 	{
 		fprintf(error_dump, "In cycle %d: Misalignment Error\n", cycles);
 		printf("In cycle %d: Misalignment Error\n", cycles);
-	}
-	if(overwriteHILO==1)
-	{
-		fprintf(error_dump, "In cycle %d: Overwrite HI-LO registers\n", cycles);
-		printf("In cycle %d: Overwrite HI-LO registers\n", cycles);
 	}
   if(numberOverflow==1)
 	{
