@@ -2,24 +2,20 @@
 
 void IFprocess()
 {
-    if(flush == 1)
-    {
-        memset(&IF_ID, 0, sizeof(IFtoID));
-        strcpy(IF_ID.instName, "NOP");
-    }else
-    {
-        getIF();
-        IF_ID.PC = PC;
-        IF_ID.instruction = IF.inst;
-        IF_ID.opcode = IF.opcode;
-        IF_ID.instructionType = IF.type;
-        IF_ID.rs = IF.rs;
-        IF_ID.rt = IF.rt;
-        IF_ID.rd = IF.rd;
-        IF_ID.C  = IF.C;
-        IF_ID.funct = IF.funct;
-        strcpy(IF_ID.instName, IF.name);
-    }
+        if(IF_ID.stall!=1)
+        {
+            getIF();
+            IF_ID.PC = PC;
+            IF_ID.instruction = IF.inst;
+            IF_ID.opcode = IF.opcode;
+            IF_ID.instructionType = IF.type;
+            IF_ID.rs = IF.rs;
+            IF_ID.rt = IF.rt;
+            IF_ID.rd = IF.rd;
+            IF_ID.C  = IF.C;
+            IF_ID.funct = IF.funct;
+            strcpy(IF_ID.instName, IF.name);
+        }
 }
 
 void IDprocess()
@@ -76,25 +72,25 @@ void IDprocess()
     isRTinDMWB = 0;
     canFWD_EXDM = 0;
     canFWD_DMWB = 0;
-    if( (EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19) && ID_EX.rs==EX_DM.rd) || (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x25 && ID_EX.rs==EX_DM.rt) || (EX_DM.opcode==0x03 && ID_EX.rs==31) )
+    if( (EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19) && ID_EX.rs==EX_DM.rd) || (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x25 && ID_EX.rs==EX_DM.rt) )
     {
-        if(ID_EX.rs != 0) isRSinEXDM = 1;
+        if(ID_EX.rs != 0 && IF_ID.instructionType!='J' ) isRSinEXDM = 1;
     }
-    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19) && ID_EX.rs==DM_WB.rd) || (DM_WB.opcode>=0x08 && DM_WB.opcode<=0x25 && ID_EX.rs==DM_WB.rt) || (DM_WB.opcode==0x03 && ID_EX.rs==31) )
+    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19) && ID_EX.rs==DM_WB.rd) || (DM_WB.opcode>=0x08 && DM_WB.opcode<=0x25 && ID_EX.rs==DM_WB.rt) )
     {
-        if(ID_EX.rs != 0) isRSinDMWB = 1;
+        if(ID_EX.rs != 0 && IF_ID.instructionType!='J' ) isRSinDMWB = 1;
     }
-    if( (EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19) && ID_EX.rt==EX_DM.rd) || (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x25 && ID_EX.rt==EX_DM.rt) || (EX_DM.opcode==0x03 && ID_EX.rt==31) )
+    if( (EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19) && ID_EX.rt==EX_DM.rd) || (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x25 && ID_EX.rt==EX_DM.rt) )
     {
-        if(ID_EX.rt != 0) isRTinEXDM = 1;
+        if(ID_EX.rt != 0 && IF_ID.instructionType!='J' ) isRTinEXDM = 1;
     }
-    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19) && ID_EX.rt==DM_WB.rd) || (DM_WB.opcode>=0x08 && DM_WB.opcode<=0x25 && ID_EX.rt==DM_WB.rt) || (DM_WB.opcode==0x03 && ID_EX.rt==31) )
+    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19) && ID_EX.rt==DM_WB.rd) || (DM_WB.opcode>=0x08 && DM_WB.opcode<=0x25 && ID_EX.rt==DM_WB.rt) )
     {
-        if(ID_EX.rt != 0) isRTinDMWB = 1;
+        if(ID_EX.rt != 0 && IF_ID.instructionType!='J' ) isRTinDMWB = 1;
     }
-    if( (EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19)) ||  (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x0F) || EX_DM.opcode==0x03 ) canFWD_EXDM = 1;
-    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19)) ||  ((DM_WB.opcode>=0x08 && DM_WB.opcode<=0x0F) || (DM_WB.opcode>=0x20 && DM_WB.opcode<=0x25)) || DM_WB.opcode==0x03 ) canFWD_DMWB = 1;
-    printf("RS: %d %d / RT: %d %d\n", isRSinEXDM, isRSinDMWB, isRTinEXDM, isRTinDMWB);
+    if( ((EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19)) ||  (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x0F)) ) canFWD_EXDM = 1;
+    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19)) ||  ((DM_WB.opcode>=0x08 && DM_WB.opcode<=0x0F) || (DM_WB.opcode>=0x20 && DM_WB.opcode<=0x25))) canFWD_DMWB = 1;
+    printf("RS: %d %d / RT: %d %d / %d %d\n", isRSinEXDM, isRSinDMWB, isRTinEXDM, isRTinDMWB, canFWD_EXDM, canFWD_DMWB);
     if( (ID_EX.instructionType=='R' && ID_EX.funct>=0x18 && ID_EX.funct<=0x2A) || (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) )
     {
         if( (isRSinEXDM==1 && isRTinEXDM==1) || (isRSinDMWB==1 && isRTinDMWB==1) )
@@ -193,7 +189,7 @@ void IDprocess()
                 EX_DM.fwd.rs = 2;
                 EX_DM.fwd.rt = 0;
                 stall = 0;
-            }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20)
+            }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode>=0x08 && DM_WB.opcode<0x20)
             {
                 ID_EX.fwd.forward = 1;
                 ID_EX.fwd.rs = 1;
@@ -209,7 +205,7 @@ void IDprocess()
                 EX_DM.fwd.rs = 0;
                 EX_DM.fwd.rt = 2;
                 stall = 0;
-            }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20)
+            }else if( canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20 )
             {
                 ID_EX.fwd.forward = 1;
                 ID_EX.fwd.rs = 0;
@@ -218,7 +214,7 @@ void IDprocess()
                 stall = 0;
             }else stall = 1;
         }else stall = 0;
-    }else if( (ID_EX.instructionType=='R' && ID_EX.funct==0x00) || (ID_EX.funct==0x02 || ID_EX.funct==0x03) )
+    }else if( ID_EX.instructionType=='R' && (ID_EX.funct==0x00 || ID_EX.funct==0x02 || ID_EX.funct==0x03) )
     {
         if(isRTinEXDM==1)
         {
@@ -355,47 +351,47 @@ void EXprocess()
         if(ID_EX.instructionType == 'R')
         {
             switch(ID_EX.funct){
-                case 0x20:
+                case 0x20:  //addr
                     EX_DM.ALUresult = (int32_t)ID_EX.REG_rs + (int32_t)ID_EX.REG_rt;
                     NumberOverflowDetection(ID_EX.REG_rs, ID_EX.REG_rt, EX_DM.ALUresult);
                     break;
-                case 0x21:
+                case 0x21:  //addu
                     EX_DM.ALUresult = ID_EX.REG_rs + ID_EX.REG_rt;
                     break;
-                case 0x22:
+                case 0x22:  //sub
                     EX_DM.ALUresult = (int32_t)ID_EX.REG_rs - (int32_t)ID_EX.REG_rt;
                     NumberOverflowDetection(ID_EX.REG_rs, ID_EX.REG_rt*(-1), EX_DM.ALUresult);
                     break;
-                case 0x24:
+                case 0x24:  //and
                     EX_DM.ALUresult = ID_EX.REG_rs & ID_EX.REG_rt;
                     break;
-                case 0x25:
+                case 0x25:   //or
                     EX_DM.ALUresult = ID_EX.REG_rs | ID_EX.REG_rt;
                     break;
-                case 0x26:
+                case 0x26:  //xor
                     EX_DM.ALUresult = ID_EX.REG_rs ^ ID_EX.REG_rt;
                     break;
-                case 0x27:
+                case 0x27:  //nor
                     EX_DM.ALUresult = ~(ID_EX.REG_rs | ID_EX.REG_rt);
                     break;
-                case 0x28:
+                case 0x28:  //nand
                     EX_DM.ALUresult = ~(ID_EX.REG_rs & ID_EX.REG_rt);
                     break;
-                case 0x2A:
+                case 0x2A:  //slt
                     EX_DM.ALUresult = ((int32_t)ID_EX.REG_rs < (int32_t)ID_EX.REG_rt) ? 1:0;
                     break;
-                case 0x00:
+                case 0x00:  //sll
                     EX_DM.ALUresult = ID_EX.REG_rs << ID_EX.C;
                     break;
-                case 0x02:
+                case 0x02:  //srl
                     EX_DM.ALUresult = ID_EX.REG_rs >> ID_EX.C;
                     break;
-                case 0x03:
+                case 0x03:  //sra
                     EX_DM.ALUresult = (int32_t)ID_EX.REG_rs >> ID_EX.C;
                     break;
-                case 0x08:
+                case 0x08:  //jr
                     break;
-                case 0x18:
+                case 0x18:  //mult
                     if(need_mfHILO==1) overwriteHILO = 1;
                     int64_t R_rs = (int32_t)ID_EX.REG_rs;
                     int64_t R_rt = (int32_t)ID_EX.REG_rt;
@@ -405,7 +401,7 @@ void EXprocess()
                     need_mfHILO = 1;
                     EX_DM.ALUresult = 0;
                     break;
-                case 0x19:
+                case 0x19:  //myluu
                     if(need_mfHILO==1) overwriteHILO = 1;
                     uint64_t uR_rs = (uint32_t)ID_EX.REG_rs;
                     uint64_t uR_rt = (uint32_t)ID_EX.REG_rt;
@@ -415,11 +411,11 @@ void EXprocess()
                     need_mfHILO = 1;
                     EX_DM.ALUresult = 0;
                     break;
-                case 0x10:
+                case 0x10:  //mfhi
                     need_mfHILO = 0;
                     EX_DM.ALUresult = HI;
                     break;
-                case 0x12:
+                case 0x12:  //mflo
                     need_mfHILO = 0;
                     EX_DM.ALUresult = LO;
                     break;
@@ -427,7 +423,8 @@ void EXprocess()
         }else
         {
             switch (ID_EX.opcode) {
-                case 0x08:
+                case 0x08:  //addi
+                    printf("%d %d\n", (int32_t)ID_EX.REG_rs, (int32_t)ID_EX.C);
                     EX_DM.ALUresult = (int32_t)ID_EX.REG_rs + (int32_t)ID_EX.C;
                     NumberOverflowDetection(ID_EX.REG_rs, ID_EX.C, EX_DM.ALUresult);
                     break;
@@ -588,6 +585,7 @@ void WBprocess()
                 {
                     REG[DM_WB.rt] = DM_WB.memData;
                     prevDM_WB.memData =  DM_WB.memData;
+                    prevDM_WB.ALUresult =  DM_WB.memData;
                 }
             }else if( DM_WB.opcode==0x08 || DM_WB.opcode==0x09 || DM_WB.opcode==0x0F || DM_WB.opcode==0x0C || DM_WB.opcode==0x0D || DM_WB.opcode==0x0E || DM_WB.opcode==0x0A )
             {

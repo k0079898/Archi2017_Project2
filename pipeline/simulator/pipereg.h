@@ -22,6 +22,7 @@ typedef struct IFtoID {
     unsigned int C;
     unsigned int funct;
     char instName[5];
+    int stall;
 } IFtoID;
 
 typedef struct IDtoEX {

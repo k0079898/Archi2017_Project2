@@ -43,12 +43,13 @@ int main()
         IDprocess();
         IFprocess();
         writeSnapshotPipe(cycles);
-        printf("stall:%d flush%d\n", stall, flush);
         if(flush!=1 && stall!=1) PC = PC + 4;
         else if(flush) PC = jumpAddress;
+        IF_ID.stall = stall;
         cycles++;
         detectSimpleEnd();
     }
+    writeError(cycles);
     closeFile();
     return 0;
 }
