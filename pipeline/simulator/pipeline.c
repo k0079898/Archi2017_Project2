@@ -86,14 +86,14 @@ void IDprocess()
     }
     if( (EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19) && ID_EX.rt==EX_DM.rd) || (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x25 && ID_EX.rt==EX_DM.rt) || (EX_DM.opcode==0x03 && ID_EX.rt==31) )
     {
-        if(ID_EX.rs != 0) isRTinEXDM = 1;
+        if(ID_EX.rt != 0) isRTinEXDM = 1;
     }
     if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19) && ID_EX.rt==DM_WB.rd) || (DM_WB.opcode>=0x08 && DM_WB.opcode<=0x25 && ID_EX.rt==DM_WB.rt) || (DM_WB.opcode==0x03 && ID_EX.rt==31) )
     {
-        if(ID_EX.rs != 0) isRTinDMWB = 1;
+        if(ID_EX.rt != 0) isRTinDMWB = 1;
     }
     if( (EX_DM.instructionType=='R' && (EX_DM.funct!=0x08 || EX_DM.funct!=0x18 || EX_DM.funct!=0x19)) ||  (EX_DM.opcode>=0x08 && EX_DM.opcode<=0x0F) || EX_DM.opcode==0x03 ) canFWD_EXDM = 1;
-    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19)) ||  (DM_WB.opcode>=0x08 && DM_WB.opcode<=0x0F) || DM_WB.opcode==0x03 ) canFWD_DMWB = 1;
+    if( (DM_WB.instructionType=='R' && (DM_WB.funct!=0x08 || DM_WB.funct!=0x18 || DM_WB.funct!=0x19)) ||  ((DM_WB.opcode>=0x08 && DM_WB.opcode<=0x0F) || (DM_WB.opcode>=0x20 && DM_WB.opcode<=0x25)) || DM_WB.opcode==0x03 ) canFWD_DMWB = 1;
     printf("RS: %d %d / RT: %d %d\n", isRSinEXDM, isRSinDMWB, isRTinEXDM, isRTinDMWB);
     if( (ID_EX.instructionType=='R' && ID_EX.funct>=0x18 && ID_EX.funct<=0x2A) || (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) )
     {
@@ -119,7 +119,7 @@ void IDprocess()
                     EX_DM.fwd.rs = 2;
                     EX_DM.fwd.rt = 2;
                     stall = 0;
-                }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05))
+                }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20)
                 {
                     ID_EX.fwd.forward = 1;
                     ID_EX.fwd.rs = 1;
@@ -137,7 +137,7 @@ void IDprocess()
                 EX_DM.fwd.rs = 1;
                 EX_DM.fwd.rt = 2;
                 stall = 0;
-            }else if(canFWD_EXDM==1 && canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05))
+            }else if(canFWD_EXDM==1 && canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20)
             {
                 ID_EX.fwd.forward = 1;
                 ID_EX.fwd.rs = 0;
@@ -153,7 +153,7 @@ void IDprocess()
                 EX_DM.fwd.rs = 2;
                 EX_DM.fwd.rt = 1;
                 stall = 0;
-            }else if(canFWD_EXDM==1 && canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05))
+            }else if(canFWD_EXDM==1 && canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20)
             {
                 ID_EX.fwd.forward = 1;
                 ID_EX.fwd.rs = 1;
@@ -165,6 +165,9 @@ void IDprocess()
         {
             if(canFWD_EXDM==1 && (ID_EX.opcode!=0x04 && ID_EX.opcode!=0x05))
             {
+                EX_DM.fwd.forward = 1;
+                EX_DM.fwd.rs = 1;
+                EX_DM.fwd.rt = 0;
                 stall = 0;
             }else if(canFWD_EXDM==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05))
             {
@@ -190,7 +193,7 @@ void IDprocess()
                 EX_DM.fwd.rs = 2;
                 EX_DM.fwd.rt = 0;
                 stall = 0;
-            }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05))
+            }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20)
             {
                 ID_EX.fwd.forward = 1;
                 ID_EX.fwd.rs = 1;
@@ -206,7 +209,7 @@ void IDprocess()
                 EX_DM.fwd.rs = 0;
                 EX_DM.fwd.rt = 2;
                 stall = 0;
-            }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05))
+            }else if(canFWD_DMWB==1 && (ID_EX.opcode==0x04 || ID_EX.opcode==0x05) && DM_WB.opcode<0x20)
             {
                 ID_EX.fwd.forward = 1;
                 ID_EX.fwd.rs = 0;
