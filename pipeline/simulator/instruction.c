@@ -181,6 +181,10 @@ void decodeIF()
     }
     if(strcmp(IF.name, "SLL")==0)
     {
-        if (IF.rt == 0 && IF.rd == 0 && IF.C == 0) strcpy(IF.name, "NOP");
+        if (IF.rt == 0 && IF.rd == 0 && IF.C == 0)
+        {
+            memset(&IF, 0, sizeof(instIF));
+            strcpy(IF.name, "NOP");
+        }
     }
 }

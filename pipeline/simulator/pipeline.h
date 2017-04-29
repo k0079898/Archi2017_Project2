@@ -9,7 +9,8 @@
 #include "regfile.h"
 
 unsigned int jumpAddress;
-int halt;
+int halt, stall, flush, isRSinEXDM, isRSinDMWB, isRTinEXDM, isRTinDMWB, canFWD_EXDM, canFWD_DMWB;
+int need_mfHILO;  //For the HI & LO overwrite detection
 
 void IFprocess();
 void IDprocess();

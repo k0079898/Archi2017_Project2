@@ -43,6 +43,7 @@ void writeMem()  //Write data into memory & free the buffer
   for(m=0; m<4; m++) temp = (temp<<8) + (unsigned char)iBuffer[m];
   PC = temp;
   for(m=4; m<8; m++) line = (line<<8) + (unsigned char)iBuffer[m];
+  PC_line = line;
   for(m=8; m<8+line*4; m++) iMem[PC+m-8] = iBuffer[m];
   //Handle with dMemory
   temp = 0;
