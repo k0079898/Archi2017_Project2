@@ -158,16 +158,6 @@ void writeError(unsigned int cycles)
 	}
 }
 
-void writeZeroError(unsigned int cycles)
-{
-    if(errorDetect.writeToRegZero==1)
-    {
-        fprintf(error_dump, "In cycle %d: Write $0 Error\n", cycles);
-        //printf("In cycle %d: Write $0 Error\n", cycles);
-        errorDetect.writeToRegZero = 0;
-    }
-}
-
 void closeFile()
 {
     fclose(snapshot);

@@ -8,9 +8,9 @@
 
 void initialSetting()
 {
-  initOutputSetting();
-  initMem();
-  initREG();
+    initOutputSetting();
+    initMem();
+    initREG();
 }
 
 void detectEnd()
@@ -40,11 +40,7 @@ int main()
         IF_ID.stall = stall;
         writeSnapshotPipe(cycles);
         if(flush!=1 && stall!=1) PC = PC + 4;
-        else if(flush)
-        {
-            printf("%08X\n", jumpAddress);
-            PC = jumpAddress;
-        }
+        else if(flush) PC = jumpAddress;
         cycles++;
         detectEnd();
     }

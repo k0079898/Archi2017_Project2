@@ -8,6 +8,7 @@
 
 #define MEM_SIZE 1024
 
+//Same as the project 1
 FILE *iimage, *dimage;
 unsigned char *iBuffer, *dBuffer;
 

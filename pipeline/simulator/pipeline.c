@@ -42,6 +42,8 @@ void IDprocess()
         memset(&ID_EX, 0, sizeof(IDtoEX));
         strcpy(ID_EX.inst.name, "NOP");
         flush = 0;
+        ID_EX.fwd.forward = 0;
+        EX_DM.fwd.forward = 0;
         return;
     }else {
         ID_EX.PC = IF_ID.PC;
@@ -56,7 +58,7 @@ void IDprocess()
     		    ID_EX.REG_rt = REG[ID_EX.inst.rt];
         }
     }
-    //handle stall
+    //handle stall detection and forwarding detection
     stall = 0;
     flush = 0;
     ID_EX.fwd.forward = 0;
@@ -67,26 +69,27 @@ void IDprocess()
     fwdD.isRTinDMWB = 0;
     fwdD.canFWD_EXDM = 0;
     fwdD.canFWD_DMWB = 0;
-    if( (EX_DM.inst.type=='R' && (EX_DM.inst.funct!=0x08 || EX_DM.inst.funct!=0x18 || EX_DM.inst.funct!=0x19) && ID_EX.inst.rs==EX_DM.inst.rd) || (EX_DM.inst.opcode>=0x08 && EX_DM.inst.opcode<=0x25 && ID_EX.inst.rs==EX_DM.inst.rt) )
+    //printf("%s %d %d %d\n", ID_EX.inst.name, ID_EX.inst.rs, ID_EX.inst.rt, ID_EX.inst.rd);
+    if( (EX_DM.inst.type=='R' && (EX_DM.inst.funct!=0x08 && EX_DM.inst.funct!=0x18 && EX_DM.inst.funct!=0x19) && ID_EX.inst.rs==EX_DM.inst.rd) || (EX_DM.inst.opcode>=0x08 && EX_DM.inst.opcode<=0x25 && ID_EX.inst.rs==EX_DM.inst.rt) )
     {
-        if(ID_EX.inst.rs != 0 && ((IF_ID.inst.type=='R' && (IF_ID.inst.funct!=0x10 || IF_ID.inst.funct!=0x12)) || (IF_ID.inst.type=='I' && (IF_ID.inst.funct!=0x0F)))) fwdD.isRSinEXDM = 1;
+        if(ID_EX.inst.rs != 0 && ((ID_EX.inst.type=='R' && (ID_EX.inst.funct!=0x10 && ID_EX.inst.funct!=0x12)) || (ID_EX.inst.type=='I' && (ID_EX.inst.funct!=0x0F)))) fwdD.isRSinEXDM = 1;
     }
-    if( (DM_WB.inst.type=='R' && (DM_WB.inst.funct!=0x08 || DM_WB.inst.funct!=0x18 || DM_WB.inst.funct!=0x19) && ID_EX.inst.rs==DM_WB.inst.rd) || (DM_WB.inst.opcode>=0x08 && DM_WB.inst.opcode<=0x25 && ID_EX.inst.rs==DM_WB.inst.rt) )
+    if( (DM_WB.inst.type=='R' && (DM_WB.inst.funct!=0x08 && DM_WB.inst.funct!=0x18 && DM_WB.inst.funct!=0x19) && ID_EX.inst.rs==DM_WB.inst.rd) || (DM_WB.inst.opcode>=0x08 && DM_WB.inst.opcode<=0x25 && ID_EX.inst.rs==DM_WB.inst.rt) || (DM_WB.inst.opcode==0x03 && ID_EX.inst.rs==31) )
     {
-        if(ID_EX.inst.rs != 0 && ((IF_ID.inst.type=='R' && (IF_ID.inst.funct!=0x10 || IF_ID.inst.funct!=0x12)) || (IF_ID.inst.type=='I' && (IF_ID.inst.funct!=0x0F)))) fwdD.isRSinDMWB = 1;
+        if(ID_EX.inst.rs != 0 && ((ID_EX.inst.type=='R' && (ID_EX.inst.funct!=0x10 && ID_EX.inst.funct!=0x12)) || (ID_EX.inst.type=='I' && (ID_EX.inst.funct!=0x0F)))) fwdD.isRSinDMWB = 1;
     }
-    if( (EX_DM.inst.type=='R' && (EX_DM.inst.funct!=0x08 || EX_DM.inst.funct!=0x18 || EX_DM.inst.funct!=0x19) && ID_EX.inst.rt==EX_DM.inst.rd) || (EX_DM.inst.opcode>=0x08 && EX_DM.inst.opcode<=0x25 && ID_EX.inst.rt==EX_DM.inst.rt) )
+    if( (EX_DM.inst.type=='R' && (EX_DM.inst.funct!=0x08 && EX_DM.inst.funct!=0x18 && EX_DM.inst.funct!=0x19) && ID_EX.inst.rt==EX_DM.inst.rd) || (EX_DM.inst.opcode>=0x08 && EX_DM.inst.opcode<=0x25 && ID_EX.inst.rt==EX_DM.inst.rt) )
     {
-        if(ID_EX.inst.rt != 0 && ((IF_ID.inst.type=='R' && (IF_ID.inst.funct!=0x10 || IF_ID.inst.funct!=0x12)) || (IF_ID.inst.type=='I' && (IF_ID.inst.funct!=0x0F)))) fwdD.isRTinEXDM = 1;
+        if(ID_EX.inst.rt != 0 && ((ID_EX.inst.type=='R' && (ID_EX.inst.funct!=0x10 && ID_EX.inst.funct!=0x12)) || (ID_EX.inst.type=='I' && (ID_EX.inst.funct!=0x0F)))) fwdD.isRTinEXDM = 1;
     }
-    if( (DM_WB.inst.type=='R' && (DM_WB.inst.funct!=0x08 || DM_WB.inst.funct!=0x18 || DM_WB.inst.funct!=0x19) && ID_EX.inst.rt==DM_WB.inst.rd) || (DM_WB.inst.opcode>=0x08 && DM_WB.inst.opcode<=0x25 && ID_EX.inst.rt==DM_WB.inst.rt) )
+    if( (DM_WB.inst.type=='R' && (DM_WB.inst.funct!=0x08 && DM_WB.inst.funct!=0x18 && DM_WB.inst.funct!=0x19) && ID_EX.inst.rt==DM_WB.inst.rd) || (DM_WB.inst.opcode>=0x08 && DM_WB.inst.opcode<=0x25 && ID_EX.inst.rt==DM_WB.inst.rt) || (DM_WB.inst.opcode==0x03 && ID_EX.inst.rt==31) )
     {
-        if(ID_EX.inst.rt != 0 && ((IF_ID.inst.type=='R' && (IF_ID.inst.funct!=0x10 || IF_ID.inst.funct!=0x12)) || (IF_ID.inst.type=='I' && (IF_ID.inst.funct!=0x0F)))) fwdD.isRTinDMWB = 1;
+        if(ID_EX.inst.rt != 0 && ((ID_EX.inst.type=='R' && (ID_EX.inst.funct!=0x10 && ID_EX.inst.funct!=0x12)) || (ID_EX.inst.type=='I' && (ID_EX.inst.funct!=0x0F)))) fwdD.isRTinDMWB = 1;
     }
-    if( ((EX_DM.inst.type=='R' && (EX_DM.inst.funct!=0x08 || EX_DM.inst.funct!=0x18 || EX_DM.inst.funct!=0x19)) ||  (EX_DM.inst.opcode>=0x08 && EX_DM.inst.opcode<=0x0F)) ) fwdD.canFWD_EXDM = 1;
-    if( (DM_WB.inst.type=='R' && (DM_WB.inst.funct!=0x08 || DM_WB.inst.funct!=0x18 || DM_WB.inst.funct!=0x19)) ||  ((DM_WB.inst.opcode>=0x08 && DM_WB.inst.opcode<=0x0F) || (DM_WB.inst.opcode>=0x20 && DM_WB.inst.opcode<=0x25))) fwdD.canFWD_DMWB = 1;
+    if( ((EX_DM.inst.type=='R' && (EX_DM.inst.funct!=0x08 || EX_DM.inst.funct!=0x18 || EX_DM.inst.funct!=0x19)) || (EX_DM.inst.opcode>=0x08 && EX_DM.inst.opcode<=0x0F)) ) fwdD.canFWD_EXDM = 1;
+    if( (DM_WB.inst.type=='R' && (DM_WB.inst.funct!=0x08 || DM_WB.inst.funct!=0x18 || DM_WB.inst.funct!=0x19)) || ((DM_WB.inst.opcode>=0x08 && DM_WB.inst.opcode<=0x0F) || (DM_WB.inst.opcode>=0x20 && DM_WB.inst.opcode<=0x25)) || (DM_WB.inst.opcode==0x03)) fwdD.canFWD_DMWB = 1;
     //printf("RS: %d %d / RT: %d %d / %d %d\n", fwdD.isRSinEXDM, fwdD.isRSinDMWB, fwdD.isRTinEXDM, fwdD.isRTinDMWB, fwdD.canFWD_EXDM, fwdD.canFWD_DMWB);
-    if( (ID_EX.inst.type=='R' && ID_EX.inst.funct>=0x18 && ID_EX.inst.funct<=0x2A) || (ID_EX.inst.opcode==0x04 || ID_EX.inst.opcode==0x05 || ID_EX.inst.opcode==0x2B || ID_EX.inst.opcode==0x28 || ID_EX.inst.opcode==0x29) )
+    if( (ID_EX.inst.type=='R' && ID_EX.inst.funct>=0x18 && ID_EX.inst.funct<=0x2A) || (ID_EX.inst.type=='I' &&  (ID_EX.inst.opcode==0x04 || ID_EX.inst.opcode==0x05 || ID_EX.inst.opcode==0x2B || ID_EX.inst.opcode==0x28 || ID_EX.inst.opcode==0x29)) )
     {
         if( (fwdD.isRSinEXDM==1 && fwdD.isRTinEXDM==1) || (fwdD.isRSinDMWB==1 && fwdD.isRTinDMWB==1) )
         {
@@ -128,13 +131,6 @@ void IDprocess()
                 EX_DM.fwd.rs = 1;
                 EX_DM.fwd.rt = 2;
                 stall = 0;
-            }else if(fwdD.canFWD_DMWB==1 && (ID_EX.inst.opcode==0x04 || ID_EX.inst.opcode==0x05) && DM_WB.inst.opcode<0x20)
-            {
-                ID_EX.fwd.forward = 1;
-                ID_EX.fwd.rs = 0;
-                ID_EX.fwd.rt = 1;
-                ID_EX.REG_rt = DM_WB.ALUresult;
-                stall = 0;
             }else stall = 1;
         }else if(fwdD.isRSinDMWB==1 && fwdD.isRTinEXDM==1)
         {
@@ -143,13 +139,6 @@ void IDprocess()
                 EX_DM.fwd.forward = 1;
                 EX_DM.fwd.rs = 2;
                 EX_DM.fwd.rt = 1;
-                stall = 0;
-            }else if(fwdD.canFWD_DMWB==1 && (ID_EX.inst.opcode==0x04 || ID_EX.inst.opcode==0x05) && DM_WB.inst.opcode<0x20)
-            {
-                ID_EX.fwd.forward = 1;
-                ID_EX.fwd.rs = 1;
-                ID_EX.fwd.rt = 0;
-                ID_EX.REG_rs = DM_WB.ALUresult;
                 stall = 0;
             }else stall = 1;
         }else if(fwdD.isRSinEXDM==1)
@@ -224,11 +213,11 @@ void IDprocess()
                 stall = 0;
             }else stall = 1;
         }else stall = 0;
-    }else if( (ID_EX.inst.type=='R' && ID_EX.inst.funct==0x08) || (ID_EX.inst.opcode!=0x0F && ID_EX.inst.opcode!=0x04 && ID_EX.inst.opcode!=0x05 || ID_EX.inst.opcode!=0x2B || ID_EX.inst.opcode!=0x28 || ID_EX.inst.opcode!=0x29) )
+    }else if( (ID_EX.inst.type=='R' && ID_EX.inst.funct==0x08) || (ID_EX.inst.type=='I' && (ID_EX.inst.opcode!=0x0F && ID_EX.inst.opcode!=0x04 && ID_EX.inst.opcode!=0x05 && ID_EX.inst.opcode!=0x2B && ID_EX.inst.opcode!=0x28 && ID_EX.inst.opcode!=0x29)) )
     {
         if(fwdD.isRSinEXDM==1)
         {
-            if(fwdD.canFWD_EXDM==1 && ((ID_EX.inst.type=='R' && ID_EX.inst.funct!=0x08) || ID_EX.inst.opcode!=0x07) )
+            if(fwdD.canFWD_EXDM==1 && ((ID_EX.inst.type=='R' && ID_EX.inst.funct!=0x08) || (ID_EX.inst.type=='I' && ID_EX.inst.opcode!=0x07)) )
             {
                 EX_DM.fwd.forward = 1;
                 EX_DM.fwd.rs = 1;
@@ -237,26 +226,23 @@ void IDprocess()
             }else stall = 1;
         }else if(fwdD.isRSinDMWB==1)
         {
-            if(fwdD.canFWD_DMWB==1)
+            if(fwdD.canFWD_DMWB==1 && ((ID_EX.inst.type=='R' && ID_EX.inst.funct!=0x08) || (ID_EX.inst.type=='I' && ID_EX.inst.opcode!=0x07)) )
             {
-                if(fwdD.canFWD_DMWB==1 && ((ID_EX.inst.type=='R' && ID_EX.inst.funct!=0x08) || ID_EX.inst.opcode!=0x07) )
-                {
-                    EX_DM.fwd.forward = 1;
-                    EX_DM.fwd.rs = 2;
-                    EX_DM.fwd.rt = 0;
-                    stall = 0;
-                }else if(fwdD.canFWD_DMWB==1 && ((ID_EX.inst.type=='R' && ID_EX.inst.funct==0x08) || ID_EX.inst.opcode==0x07 ))
-                {
-                    ID_EX.fwd.forward = 1;
-                    ID_EX.fwd.rs = 1;
-                    ID_EX.fwd.rt = 0;
-                    ID_EX.REG_rs = DM_WB.ALUresult;
-                    stall = 0;
-                }else stall = 1;
-            }else stall = 0;
+                EX_DM.fwd.forward = 1;
+                EX_DM.fwd.rs = 2;
+                EX_DM.fwd.rt = 0;
+                stall = 0;
+            }else if(fwdD.canFWD_DMWB==1 && ((ID_EX.inst.type=='R' && ID_EX.inst.funct==0x08) || (ID_EX.inst.type=='I' && ID_EX.inst.opcode==0x07)) && DM_WB.inst.opcode<0x20)
+            {
+                ID_EX.fwd.forward = 1;
+                ID_EX.fwd.rs = 1;
+                ID_EX.fwd.rt = 0;
+                ID_EX.REG_rs = DM_WB.ALUresult;
+                stall = 0;
+            }else stall = 1;
         }else stall = 0;
     }
-    //handle flush
+    //handle flush detection
     if(stall == 0)
     {
         if(ID_EX.inst.type=='R' && ID_EX.inst.funct==0x08) //jr
@@ -460,7 +446,7 @@ void EXprocess()
                     break;
             }
         }
-    }
+    }else memset(&EX_DM.prev_fwd, 0, sizeof(forwarding));
     EX_DM.PC = ID_EX.PC;
     EX_DM.inst = ID_EX.inst;
     EX_DM.REG_rt = ID_EX.REG_rt;
@@ -486,7 +472,7 @@ void DMprocess()
                 MemAddOverflowDetection(addr, 0);
             }
         }
-        if(halt != 1)
+        if(halt != 1)  //If not error need to halt, than write in memory
         {
             if( EX_DM.inst.opcode==0x23 )  //lw
             {
@@ -537,7 +523,7 @@ void WBprocess()
                 prevDM_WB.result   =  DM_WB.ALUresult;
             }
         }else if( DM_WB.inst.type == 'I' )
-        {
+        {  //iType without sw, sh, sb, beq, bne, bgtz
             if( DM_WB.inst.opcode==0x23 || DM_WB.inst.opcode==0x21 || DM_WB.inst.opcode==0x25 || DM_WB.inst.opcode==0x20 || DM_WB.inst.opcode==0x24 )
             {  //lw, lh, lhu, lb, lbu
                 if(DM_WB.inst.rt == 0) errorDetect.writeToRegZero = 1;

@@ -18,7 +18,7 @@ void MemAddOverflowDetection(int addr, int size);         //Detect memory addres
 void DataMisalignedDetection(int words, int size);        //Detect data misaligned
 
 //New things
-typedef struct _forwardingDetect {
+typedef struct _forwardingDetect {  //Use to detect the forwarding
     int isRSinEXDM;
     int isRSinDMWB;
     int isRTinEXDM;
@@ -27,8 +27,8 @@ typedef struct _forwardingDetect {
     int canFWD_DMWB;
 } fwdDetect;
 
-int halt, stall, flush;
-fwdDetect fwdD;
+int halt, stall, flush;  //PC state
+fwdDetect fwdD;          //Use to detect the forwarding
 
 void IFprocess();
 void IDprocess();

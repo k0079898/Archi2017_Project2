@@ -8,24 +8,22 @@
 #include "pipereg.h"
 #include "pipeline.h"
 
-//Same as project 1
 typedef struct _error {
-    int writeToRegZero;
-    int memAddOverflow;
-    int dataMisaligned;
-    int overwriteHILO;
-    int numberOverflow;
+    int writeToRegZero;  //Write to register $0
+    int memAddOverflow;  //D-Memory address overflow
+    int dataMisaligned;  //D-Memory miss align error
+    int overwriteHILO;   //Overwrite HI-LO registers
+    int numberOverflow;  //Number overflow
 } error;
 
-FILE *snapshot, *error_dump;
+FILE *snapshot, *error_dump;                     //File pointer
 unsigned int L_REG[REG_SIZE], L_PC, L_HI, L_LO;  //Save the last changed value
-error errorDetect;
+error errorDetect;                               //To save the error detection
 
-void initOutputSetting();                     //
-void writeSnapshotREG(unsigned int cycles);   //
-void writeSnapshotPipe(unsigned int cycles);  //
-void writeError(unsigned int cycles);         //
-void writeZeroError(unsigned int cycles);     //
-void closeFile();                             //
+void initOutputSetting();                     //Open file
+void writeSnapshotREG(unsigned int cycles);   //Write the REG part
+void writeSnapshotPipe(unsigned int cycles);  //Write the Pipeline part
+void writeError(unsigned int cycles);         //Write the ERROR
+void closeFile();                             //Close file
 
 #endif

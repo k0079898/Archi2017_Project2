@@ -183,7 +183,6 @@ void decodeInstruction()
     {
         if (IF_ID.inst.rt == 0 && IF_ID.inst.rd == 0 && IF_ID.inst.C == 0)
         {
-            memset(&IF_ID.inst, 0, sizeof(instruct));
             strcpy(IF_ID.inst.name, "NOP");
         }
     }

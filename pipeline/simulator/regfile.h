@@ -6,6 +6,7 @@
 
 #define REG_SIZE 32
 
+//Same as the project 1
 unsigned int initPC;  //Save the initial PC address
 
 //Register
