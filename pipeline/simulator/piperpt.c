@@ -60,8 +60,8 @@ void writeSnapshotPipe(unsigned int cycles)
 {
   fprintf(snapshot, "PC: 0x%08X\n", PC);
   //printf("PC: 0x%08X\n", PC);
-  fprintf(snapshot, "IF: 0x%08X", IF.inst);
-  //printf("IF: 0x%08X", IF.inst);
+  fprintf(snapshot, "IF: 0x%08X", IF_ID.inst.inst);
+  //printf("IF: 0x%08X", IF_ID.inst.inst);
   if(stall==1)
   {
       fprintf(snapshot, " to_be_stalled");
@@ -72,8 +72,8 @@ void writeSnapshotPipe(unsigned int cycles)
       //printf(" to_be_flushed");
   }
 
-  fprintf(snapshot, "\nID: %s", ID_EX.instName);
-  //printf("\nID: %s", ID_EX.instName);
+  fprintf(snapshot, "\nID: %s", ID_EX.inst.name);
+  //printf("\nID: %s", ID_EX.inst.name);
   if(stall==1)
   {
       fprintf(snapshot, " to_be_stalled");
@@ -83,82 +83,88 @@ void writeSnapshotPipe(unsigned int cycles)
   {
       if(ID_EX.fwd.rs==1)
       {
-          fprintf(snapshot, " fwd_EX-DM_rs_$%d", ID_EX.rs);
-          //printf(" fwd_EX-DM_rs_$%d", ID_EX.rs);
+          fprintf(snapshot, " fwd_EX-DM_rs_$%d", ID_EX.inst.rs);
+          //printf(" fwd_EX-DM_rs_$%d", ID_EX.inst.rs);
       }
 
       if(ID_EX.fwd.rt==1)
       {
-          fprintf(snapshot, " fwd_EX-DM_rt_$%d", ID_EX.rt);
-          //printf(" fwd_EX-DM_rt_$%d", ID_EX.rt);
+          fprintf(snapshot, " fwd_EX-DM_rt_$%d", ID_EX.inst.rt);
+          //printf(" fwd_EX-DM_rt_$%d", ID_EX.inst.rt);
       }
   }
-  fprintf(snapshot, "\nEX: %s", EX_DM.instName);
-  //printf("\nEX: %s", EX_DM.instName);
+  fprintf(snapshot, "\nEX: %s", EX_DM.inst.name);
+  //printf("\nEX: %s", EX_DM.inst.name);
   if(EX_DM.prev_fwd.forward==1)
   {
       if(EX_DM.prev_fwd.rs==1)
       {
-          fprintf(snapshot, " fwd_EX-DM_rs_$%d", EX_DM.rs);
-          //printf(" fwd_EX-DM_rs_$%d", EX_DM.rs);
+          fprintf(snapshot, " fwd_EX-DM_rs_$%d", EX_DM.inst.rs);
+          //printf(" fwd_EX-DM_rs_$%d", EX_DM.inst.rs);
       }if(EX_DM.prev_fwd.rs==2)
       {
-          fprintf(snapshot, " fwd_DM-WB_rs_$%d", EX_DM.rs);
-          //printf(" fwd_DM-WB_rs_$%d", EX_DM.rs);
+          fprintf(snapshot, " fwd_DM-WB_rs_$%d", EX_DM.inst.rs);
+          //printf(" fwd_DM-WB_rs_$%d", EX_DM.inst.rs);
       }
 
       if(EX_DM.prev_fwd.rt==1)
       {
-          fprintf(snapshot, " fwd_EX-DM_rt_$%d", EX_DM.rt);
-          //printf(" fwd_EX-DM_rt_$%d", EX_DM.rt);
+          fprintf(snapshot, " fwd_EX-DM_rt_$%d", EX_DM.inst.rt);
+          //printf(" fwd_EX-DM_rt_$%d", EX_DM.inst.rt);
       }if(EX_DM.prev_fwd.rt==2)
       {
-          fprintf(snapshot, " fwd_DM-WB_rt_$%d", EX_DM.rt);
-          //printf(" fwd_DM-WB_rt_$%d", EX_DM.rt);
+          fprintf(snapshot, " fwd_DM-WB_rt_$%d", EX_DM.inst.rt);
+          //printf(" fwd_DM-WB_rt_$%d", EX_DM.inst.rt);
       }
   }
-  fprintf(snapshot, "\nDM: %s\n", DM_WB.instName);
-  //printf("\nDM: %s\n", DM_WB.instName);
-  fprintf(snapshot, "WB: %s\n\n\n", prevDM_WB.instName);
-  //printf("WB: %s\n\n\n", prevDM_WB.instName);
+  fprintf(snapshot, "\nDM: %s\n", DM_WB.inst.name);
+  //printf("\nDM: %s\n", DM_WB.inst.name);
+  fprintf(snapshot, "WB: %s\n\n\n", prevDM_WB.inst.name);
+  //printf("WB: %s\n\n\n", prevDM_WB.inst.name);
 }
 
 
 void writeError(unsigned int cycles)
 {
-  if(overwriteHILO==1)
+  if(errorDetect.writeToRegZero==1)
   {
-    fprintf(error_dump, "In cycle %d: Overwrite HI-LO registers\n", cycles);
-    //printf("In cycle %d: Overwrite HI-LO registers\n", cycles);
-    overwriteHILO = 0;
+      fprintf(error_dump, "In cycle %d: Write $0 Error\n", cycles);
+      //printf("In cycle %d: Write $0 Error\n", cycles);
+      errorDetect.writeToRegZero = 0;
   }
-  if(memAddOverflow==1)
+  if(errorDetect.memAddOverflow==1)
 	{
 		fprintf(error_dump, "In cycle %d: Address Overflow\n", cycles);
 		//printf("In cycle %d: Address Overflow\n", cycles);
-    memAddOverflow = 0;
+    errorDetect.memAddOverflow = 0;
 	}
-	if(dataMisaligned==1)
+	if(errorDetect.dataMisaligned==1)
 	{
 		fprintf(error_dump, "In cycle %d: Misalignment Error\n", cycles);
 		//printf("In cycle %d: Misalignment Error\n", cycles);
-    dataMisaligned = 0;
+    errorDetect.dataMisaligned = 0;
 	}
-  if(numberOverflow==1)
+  if(errorDetect.overwriteHILO==1)
+  {
+    fprintf(error_dump, "In cycle %d: Overwrite HI-LO registers\n", cycles);
+    //printf("In cycle %d: Overwrite HI-LO registers\n", cycles);
+    errorDetect.overwriteHILO = 0;
+  }
+  if(errorDetect.numberOverflow==1)
 	{
 		fprintf(error_dump, "In cycle %d: Number Overflow\n", cycles);
 		//printf("In cycle %d: Number Overflow\n", cycles);
-    numberOverflow = 0;
+    errorDetect.numberOverflow = 0;
 	}
 }
 
 void writeZeroError(unsigned int cycles)
 {
-    if(writeToRegZero==1)
+    if(errorDetect.writeToRegZero==1)
     {
         fprintf(error_dump, "In cycle %d: Write $0 Error\n", cycles);
         //printf("In cycle %d: Write $0 Error\n", cycles);
-        writeToRegZero = 0;
+        errorDetect.writeToRegZero = 0;
     }
 }
 

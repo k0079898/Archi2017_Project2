@@ -1,190 +1,190 @@
 #include "instruction.h"
 
-void getIF()
+void getInstruction()
 {
-    for(int i=0; i<4; i++) IF.inst = (IF.inst<<8) + (unsigned char)iMem[PC+i];
-    decodeIF();
+    for(int i=0; i<4; i++) IF_ID.inst.inst = (IF_ID.inst.inst<<8) + (unsigned char)iMem[IF_ID.PC+i];
+    decodeInstruction();
 }
 
-void decodeIF()
+void decodeInstruction()
 {
-    IF.opcode = IF.inst >> 26;
-    IF.rs = IF.inst << 6 >> 27;
-    IF.rt = IF.inst << 11 >> 27;
-    IF.rd = IF.inst << 16 >> 27;
-    switch (IF.opcode) {
+    IF_ID.inst.opcode = IF_ID.inst.inst >> 26;
+    IF_ID.inst.rs = IF_ID.inst.inst << 6 >> 27;
+    IF_ID.inst.rt = IF_ID.inst.inst << 11 >> 27;
+    IF_ID.inst.rd = IF_ID.inst.inst << 16 >> 27;
+    switch (IF_ID.inst.opcode) {
     case 0x00: //R-Type
-        IF.type = 'R';
-        IF.C  = IF.inst << 21 >> 27;
-        IF.funct = IF.inst << 26 >> 26;
-        switch (IF.funct) {
+        IF_ID.inst.type = 'R';
+        IF_ID.inst.C  = IF_ID.inst.inst << 21 >> 27;
+        IF_ID.inst.funct = IF_ID.inst.inst << 26 >> 26;
+        switch (IF_ID.inst.funct) {
           case 0x20:
-              strcpy(IF.name, "ADD");
+              strcpy(IF_ID.inst.name, "ADD");
               break;
           case 0x21:
-              strcpy(IF.name, "ADDU");
+              strcpy(IF_ID.inst.name, "ADDU");
               break;
           case 0x22:
-              strcpy(IF.name, "SUB");
+              strcpy(IF_ID.inst.name, "SUB");
               break;
           case 0x24:
-              strcpy(IF.name, "AND");
+              strcpy(IF_ID.inst.name, "AND");
               break;
           case 0x25:
-              strcpy(IF.name, "OR");
+              strcpy(IF_ID.inst.name, "OR");
               break;
           case 0x26:
-              strcpy(IF.name, "XOR");
+              strcpy(IF_ID.inst.name, "XOR");
               break;
           case 0x27:
-              strcpy(IF.name, "NOR");
+              strcpy(IF_ID.inst.name, "NOR");
               break;
           case 0x28:
-              strcpy(IF.name, "NAND");
+              strcpy(IF_ID.inst.name, "NAND");
               break;
           case 0x2A:
-              strcpy(IF.name, "SLT");
+              strcpy(IF_ID.inst.name, "SLT");
               break;
           case 0x00:
-              strcpy(IF.name, "SLL");
+              strcpy(IF_ID.inst.name, "SLL");
               break;
           case 0x02:
-              strcpy(IF.name, "SRL");
+              strcpy(IF_ID.inst.name, "SRL");
               break;
           case 0x03:
-              strcpy(IF.name, "SRA");
+              strcpy(IF_ID.inst.name, "SRA");
               break;
           case 0x08:
-              strcpy(IF.name, "JR");
+              strcpy(IF_ID.inst.name, "JR");
               break;
           case 0x18:
-              strcpy(IF.name, "MULT");
+              strcpy(IF_ID.inst.name, "MULT");
               break;
           case 0x19:
-              strcpy(IF.name, "MULTU");
+              strcpy(IF_ID.inst.name, "MULTU");
               break;
           case 0x10:
-              strcpy(IF.name, "MFHI");
+              strcpy(IF_ID.inst.name, "MFHI");
               break;
           case 0x12:
-              strcpy(IF.name, "MFLO");
+              strcpy(IF_ID.inst.name, "MFLO");
               break;
         }
         break;
     //I-Type
     case 0x08:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "ADDI");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "ADDI");
         break;
     case 0x09:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "ADDIU");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "ADDIU");
         break;
     case 0x23:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "LW");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "LW");
         break;
     case 0x21:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "LH");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "LH");
         break;
     case 0x25:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "LHU");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "LHU");
         break;
     case 0x20:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "LB");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "LB");
         break;
     case 0x24:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "LBU");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "LBU");
         break;
     case 0x2B:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "SW");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "SW");
         break;
     case 0x29:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "SH");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "SH");
         break;
     case 0x28:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "SB");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "SB");
         break;
     case 0x0F:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "LUI");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "LUI");
         break;
     case 0x0C:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "ANDI");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "ANDI");
         break;
     case 0x0D:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "ORI");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "ORI");
         break;
     case 0x0E:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "NORI");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "NORI");
         break;
     case 0x0A:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "SLTI");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "SLTI");
         break;
     case 0x04:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "BEQ");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "BEQ");
         break;
     case 0x05:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "BNE");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "BNE");
         break;
     case 0x07:
-        IF.type = 'I';
-        IF.C  = (short int)IF.inst << 16 >> 16;
-        strcpy(IF.name, "BGTZ");
+        IF_ID.inst.type = 'I';
+        IF_ID.inst.C  = (short int)IF_ID.inst.inst << 16 >> 16;
+        strcpy(IF_ID.inst.name, "BGTZ");
         break;
     //J-Type
     case 0x02:
-        IF.type = 'J';
-        IF.C = IF.inst << 6 >> 6;
-        strcpy(IF.name, "J");
+        IF_ID.inst.type = 'J';
+        IF_ID.inst.C = IF_ID.inst.inst << 6 >> 6;
+        strcpy(IF_ID.inst.name, "J");
         break;
     case 0x03:
-        IF.type = 'J';
-        IF.C = IF.inst << 6 >> 6;
-        strcpy(IF.name, "JAL");
+        IF_ID.inst.type = 'J';
+        IF_ID.inst.C = IF_ID.inst.inst << 6 >> 6;
+        strcpy(IF_ID.inst.name, "JAL");
         break;
     //S-Type
     case 0x3F:
-        IF.type = 'S';
-        strcpy(IF.name, "HALT");
+        IF_ID.inst.type = 'S';
+        strcpy(IF_ID.inst.name, "HALT");
         break;
     }
-    if(strcmp(IF.name, "SLL")==0)
+    if(strcmp(IF_ID.inst.name, "SLL")==0)
     {
-        if (IF.rt == 0 && IF.rd == 0 && IF.C == 0)
+        if (IF_ID.inst.rt == 0 && IF_ID.inst.rd == 0 && IF_ID.inst.C == 0)
         {
-            memset(&IF, 0, sizeof(instIF));
-            strcpy(IF.name, "NOP");
+            memset(&IF_ID.inst, 0, sizeof(instruct));
+            strcpy(IF_ID.inst.name, "NOP");
         }
     }
 }

@@ -5,13 +5,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "regfile.h"
-#include "pipereg.h"
 
 #define MEM_SIZE 1024
 
 FILE *iimage, *dimage;
 unsigned char *iBuffer, *dBuffer;
-int PC_line;
 
 //Memory
 unsigned char iMem[MEM_SIZE];

@@ -2,86 +2,60 @@
 #define pipereg_h
 
 #include <stdio.h>
+#include <string.h>
 #include "instruction.h"
-#include "regfile.h"
 
-typedef struct forwarding {
+typedef struct _instruction {
+  unsigned int inst;
+  unsigned int opcode;
+  char type;
+  unsigned int rs;
+  unsigned int rt;
+  unsigned int rd;
+  unsigned int C;
+  unsigned int funct;
+  char name[5];
+} instruct;
+
+typedef struct _forwarding {
 	int forward;
 	int rs;  //0: no forward, 1: forward form EX/DM, 2:forward form DM/WB
 	int rt;  //0: no forward, 1: forward form EX/DM, 2:forward form DM/WB
 } forwarding;
 
-typedef struct IFtoID {
+typedef struct _IFtoID {
     unsigned int PC;
-    unsigned int instruction;
-    unsigned int opcode;
-    char instructionType;
-    unsigned int rs;
-    unsigned int rt;
-    unsigned int rd;
-    unsigned int C;
-    unsigned int funct;
-    char instName[5];
+		instruct inst;
     int stall;
 } IFtoID;
 
-typedef struct IDtoEX {
+typedef struct _IDtoEX {
     unsigned int PC;
-    unsigned int instruction;
-    unsigned int opcode;
-    char instructionType;
-    unsigned int rs;
-    unsigned int REG_rs;
-    unsigned int rt;
+    instruct inst;
+		unsigned int REG_rs;
     unsigned int REG_rt;
-    unsigned int rd;
-    unsigned int C;
-    unsigned int funct;
-    char instName[5];
-    int NOP;
     forwarding fwd;
 } IDtoEX;
 
-typedef struct EXtoDM {
+typedef struct _EXtoDM {
     unsigned int PC;
-    unsigned int instruction;
-    unsigned int opcode;
-    char instructionType;
-    unsigned int rs;
-    unsigned int rt;
-    unsigned int REG_rt;
-    unsigned int rd;
-    unsigned int funct;
-    char instName[5];
+    instruct inst;
+		unsigned int REG_rt;
     unsigned int ALUresult;
-    int NOP;
     forwarding prev_fwd;
     forwarding fwd;
 } EXtoDM;
 
-typedef struct DMtoWB {
+typedef struct _DMtoWB {
     unsigned int PC;
-    unsigned int instruction;
-    unsigned int opcode;
-    char instructionType;
-    char instName[5];
-    unsigned int rd;
-    unsigned int rt;
-    unsigned int funct;
+    instruct inst;
     unsigned int memData;
     unsigned int ALUresult;
-    int NOP;
 } DMtoWB;
 
 typedef struct prevDMtoWB {
-    unsigned int PC;
-    unsigned int instruction;
-    char instructionType;
-    unsigned int opcode;
-    char instName[5];
-    unsigned int memData;
-    unsigned int ALUresult;
-    int NOP;
+    instruct inst;
+    unsigned int result;
 } prevDMtoWB;
 
 IFtoID      IF_ID;

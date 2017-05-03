@@ -4,15 +4,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "instruction.h"
 #include "regfile.h"
 #include "pipereg.h"
 #include "pipeline.h"
 
-FILE *snapshot, *error_dump;
+//Same as project 1
+typedef struct _error {
+    int writeToRegZero;
+    int memAddOverflow;
+    int dataMisaligned;
+    int overwriteHILO;
+    int numberOverflow;
+} error;
 
+FILE *snapshot, *error_dump;
 unsigned int L_REG[REG_SIZE], L_PC, L_HI, L_LO;  //Save the last changed value
-int writeToRegZero, memAddOverflow, dataMisaligned, overwriteHILO, numberOverflow;
+error errorDetect;
 
 void initOutputSetting();                     //
 void writeSnapshotREG(unsigned int cycles);   //
